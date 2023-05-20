@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  servlet:
+    application-display-name: unsplash-api-app
+    encoding:
+      enabled: true
+      charset: UTF-8
+      force: true
+
+spring:
+  application:
+    name: unsplash-api-app
+  data:
+    mongodb:
+      database: unsplash-db
+      uri: mongodb://localhost:27017
+
+# App
+unsplash:
+  unsplash-api-base-url: https://api.unsplash.com
+  unsplash-api-access-key: y1wTpvsv3-tOwey2jeajeTV9IT6Zvb69OabNPLjkWTk
