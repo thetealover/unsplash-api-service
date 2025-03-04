@@ -4,11 +4,11 @@ import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.api.unsplash.domain.imagemetadata.model.ImageMetadata;
 import org.api.unsplash.domain.imagemetadata.port.CreateImageMetadataPort;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 
-@Service
+@Repository
 @Transactional
 @RequiredArgsConstructor
 public class ImageMetadataPersistenceAdapter implements CreateImageMetadataPort {

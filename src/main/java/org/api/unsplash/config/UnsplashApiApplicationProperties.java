@@ -8,4 +8,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class UnsplashApiApplicationProperties {
   private String unsplashApiBaseUrl;
   private String unsplashApiAccessKey;
+  private String appVersion;
 }

@@ -17,5 +17,6 @@ spring:
 
 # App
 unsplash:
+  app-version: @version@
   unsplash-api-base-url: https://api.unsplash.com
   unsplash-api-access-key: y1wTpvsv3-tOwey2jeajeTV9IT6Zvb69OabNPLjkWTk

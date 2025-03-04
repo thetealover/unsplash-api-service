@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -5,28 +7,35 @@ plugins {
     id 'com.diffplug.spotless' version '6.12.0'
 }
 
-group = "org.api.unsplash"
-version = "1.0-SNAPSHOT"
-sourceCompatibility = 17
-targetCompatibility = 17
+group = "${group}"
+version = "${version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of("${javaVersion}")
+
+ext {
+    springdocOpenApiVersion = '2.3.0'
+    naharooMsToolkitBomVersion = '0.7.12'
+    naharooMapstructFacadeSpringBootStarterVersion = '1.6.5'
+    lombokMapstructBindingVersion = '0.2.0'
+    lombokVersion = '1.18.34'
+
+    googleJavaFormatVersion = '1.19.1'
+}
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
-spotless {
-    java {
-        googleJavaFormat()
-    }
+spotless.java {
+    googleJavaFormat(googleJavaFormatVersion).style('GOOGLE')
 }
 
-bootJar {
-    archiveFileName = "final-archive.jar"
-}
+bootJar.archiveFileName = "final-archive.jar"
 
 dependencyManagement {
     imports {
-        mavenBom "com.naharoo.commons:ms-toolkit-bom:0.7.12"
+        mavenBom "com.naharoo.commons:ms-toolkit-bom:${naharooMsToolkitBomVersion}"
     }
 }
 
@@ -36,16 +45,35 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocOpenApiVersion}"
 
     // Mapstruct
-    annotationProcessor 'org.mapstruct:mapstruct-processor:'
+    annotationProcessor 'org.mapstruct:mapstruct-processor'
     implementation 'org.mapstruct:mapstruct'
-    implementation 'com.naharoo.commons:mapstruct-facade-spring-boot-starter:1.6.5'
-    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
-    compileOnly "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    implementation "com.naharoo.commons:mapstruct-facade-spring-boot-starter:${naharooMapstructFacadeSpringBootStarterVersion}"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+    compileOnly "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
 
     // lombok
-    compileOnly 'org.projectlombok:lombok:1.18.26'
-    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
 
+// populating values from gradle.properties to the specified spring application properties files
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    with copySpec {
+        from 'src/main/resources'
+        include '**/application*.properties'
+        include '**/application*.yaml'
+        include '**/application*.yml'
+        include '/bootstrap-local.yml'
+        project.properties.findAll().each {
+            prop ->
+                if (prop.key != null) {
+                    filter(ReplaceTokens, tokens: [(prop.key): prop.value.toString()])
+                    filter(ReplaceTokens, tokens: [('project.' + prop.key): prop.value.toString()])
+                }
+        }
+    }
 }
